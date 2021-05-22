@@ -1,0 +1,7 @@
+{
+    "db_network": "tcp",
+    "db_addr": "localhost:5432",
+    "db_user": "goapibase",
+    "db_password": "goapibase",
+    "db_database": "goapibase"
+}

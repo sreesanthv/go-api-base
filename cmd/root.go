@@ -32,6 +32,12 @@ func init() {
 	rootCmd.PersistentFlags().Bool("db_debug", false, "log sql to console")
 	viper.BindPFlag("db_debug", rootCmd.PersistentFlags().Lookup("db_debug"))
 
+	viper.SetDefault("db_network", "tcp")
+	viper.SetDefault("db_addr", "localhost:5432")
+	viper.SetDefault("db_user", "goapibase")
+	viper.SetDefault("db_password", "goapibase")
+	viper.SetDefault("db_database", "goapibase")
+
 	viper.SetDefault("log_level", "debug")
 }
 
