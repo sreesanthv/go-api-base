@@ -14,6 +14,7 @@ updated_at timestamp with time zone DEFAULT current_timestamp,
 last_login timestamp with time zone NOT NULL DEFAULT current_timestamp,
 email text NOT NULL UNIQUE,
 name text NOT NULL,
+password text NOT NULL,
 active boolean NOT NULL DEFAULT TRUE,
 roles text[] NOT NULL DEFAULT '{"user"}',
 PRIMARY KEY (id)

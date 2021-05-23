@@ -16,3 +16,9 @@ Clone this repo and start your API development.
 - Integrated with migration package.
 - Run migration: ```go run main.go migrate```
 - Reset migration: ```go run main.go migrate --reset```
+
+## Dev Guidelines
+- In order to prevent circular dependency follow the below rules.
+- ```app``` package can import ```service``` package. ```service``` can't import ```app```.
+- ```service``` package can import ```database``` package. database can't import ```service```.
+- Do not import ```database``` package directly from app.

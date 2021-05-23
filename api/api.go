@@ -9,11 +9,21 @@ import (
 	"github.com/go-chi/cors"
 	"github.com/go-chi/render"
 	"github.com/spf13/viper"
+	"github.com/sreesanthv/go-api-base/database"
 	"github.com/sreesanthv/go-api-base/logging"
 )
 
 func New() (*chi.Mux, error) {
 	logger := logging.NewLogger()
+
+	db, err := database.DBConn()
+	if err != nil {
+		logger.WithField("module", "database").Error(err)
+		return nil, err
+	}
+
+	auth := NewAuthHandler(db, logger)
+
 	r := chi.NewRouter()
 	r.Use(middleware.Recoverer)
 	r.Use(middleware.RequestID)
@@ -27,6 +37,7 @@ func New() (*chi.Mux, error) {
 		r.Use(corsConfig().Handler)
 	}
 
+	r.Mount("/auth", auth.Router())
 	r.Get("/status", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("status"))
 	})

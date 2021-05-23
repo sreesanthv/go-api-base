@@ -7,13 +7,13 @@ import (
 )
 
 const bootstrapAdminAccount = `
-INSERT INTO accounts (id, email, name, active, roles)
-VALUES (DEFAULT, 'admin@local.io', 'Admin User', true, '{admin}')
+INSERT INTO accounts (id, email, name, active, roles, password)
+VALUES (DEFAULT, 'admin@local.io', 'Admin User', true, '{admin}', '$2a$14$qa6K8ZwSK0.lQEYIPpfrW.ib0rhYsaAG1NoqZHhBcgOiZXdJ6LkbK')
 `
 
 const bootstrapUserAccount = `
-INSERT INTO accounts (id, email, name, active)
-VALUES (DEFAULT, 'user@local.io', 'User', true)`
+INSERT INTO accounts (id, email, name, active, password)
+VALUES (DEFAULT, 'user@local.io', 'User', true, '$2a$14$qa6K8ZwSK0.lQEYIPpfrW.ib0rhYsaAG1NoqZHhBcgOiZXdJ6LkbK')`
 
 func init() {
 	up := []string{
