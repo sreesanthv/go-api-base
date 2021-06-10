@@ -81,6 +81,21 @@ func (h *Handler) badDataResponse(w http.ResponseWriter, message string) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	w.Write(jData)
 	w.WriteHeader(http.StatusBadRequest)
+	w.Write(jData)
+}
+
+func (h *Handler) ServerError(w http.ResponseWriter) {
+	dt := &responseData{
+		Status:  "nok",
+		Message: "Failed to process the request",
+	}
+
+	jData, err := json.Marshal(dt)
+	if err != nil {
+		h.logger.Error(err)
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusInternalServerError)
+	w.Write(jData)
 }

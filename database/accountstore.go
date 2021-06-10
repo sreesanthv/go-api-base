@@ -15,7 +15,7 @@ func (s *Store) GetUser(email string) (*AccountStore, error) {
 		&as.ID, &as.Email, &as.Name, &as.Password,
 	)
 
-	if s.IsSQLError(err) {
+	if err != nil && s.IsSQLError(err) {
 		fmt.Println("Error in GetUser query", err)
 		return as, err
 	}

@@ -27,22 +27,20 @@ func NewRedis(logger *logrus.Logger) *Redis {
 	}
 }
 
-func (r *Redis) Set(key string, value interface{}, expiry time.Duration) {
+func (r *Redis) Set(key string, value interface{}, expiry time.Duration) error {
 	err := r.rdb.Set(r.ctx, key, value, expiry).Err()
 	if err != nil {
 		r.logger.Error("Error writing Redis:", err)
 	}
+
+	return err
 }
 
-func (r *Redis) Get(key string) (string, bool) {
-	hasValue := true
+func (r *Redis) Get(key string) (string, error) {
 	res, err := r.rdb.Get(r.ctx, key).Result()
-	if err == redis.Nil {
-		hasValue = false
-	} else if err != nil {
-		hasValue = false
+	if err != redis.Nil {
 		r.logger.Error("Error accessing Redis:", err)
 	}
 
-	return res, hasValue
+	return res, err
 }

@@ -49,5 +49,22 @@ func (h *AuthHandler) login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	h.sendResponse(w, nil)
+	token, err := h.authService.CreateToken(user)
+	if err != nil {
+		h.ServerError(w)
+		return
+	}
+
+	err = h.authService.PersistToken(user.ID, token)
+	if err != nil {
+		h.ServerError(w)
+		return
+	}
+
+	tokens := map[string]string{
+		"access_token":  token.AccessToken,
+		"refresh_token": token.RefreshToken,
+	}
+
+	h.sendResponse(w, tokens)
 }
