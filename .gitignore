@@ -13,3 +13,4 @@
 
 .config.json
 go-api-base
+/data/db

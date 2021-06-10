@@ -9,8 +9,12 @@ require (
 	github.com/go-chi/render v1.0.1
 	github.com/go-pg/migrations v6.2.0+incompatible
 	github.com/go-pg/pg v7.1.7+incompatible
+	github.com/go-redis/redis/v8 v8.10.0
+	github.com/jackc/pgx v3.6.2+incompatible
+	github.com/jackc/pgx/v4 v4.11.0
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/sirupsen/logrus v1.4.2
 	github.com/spf13/cobra v1.1.3
 	github.com/spf13/viper v1.7.1
+	golang.org/x/crypto v0.0.0-20210322153248-0c34fe9e7dc2
 )

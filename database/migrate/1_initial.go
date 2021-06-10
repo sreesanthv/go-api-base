@@ -20,23 +20,9 @@ roles text[] NOT NULL DEFAULT '{"user"}',
 PRIMARY KEY (id)
 )`
 
-const tokenTable = `
-CREATE TABLE tokens (
-id serial NOT NULL,
-created_at timestamp with time zone NOT NULL DEFAULT current_timestamp,
-updated_at timestamp with time zone NOT NULL DEFAULT current_timestamp,
-account_id int NOT NULL REFERENCES accounts(id),
-token text NOT NULL UNIQUE,
-expiry timestamp with time zone NOT NULL,
-mobile boolean NOT NULL DEFAULT FALSE,
-identifier text,
-PRIMARY KEY (id)
-)`
-
 func init() {
 	up := []string{
 		accountTable,
-		tokenTable,
 	}
 
 	down := []string{

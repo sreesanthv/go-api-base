@@ -4,18 +4,20 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi"
-	"github.com/go-pg/pg"
-	"github.com/sirupsen/logrus"
+	"github.com/sreesanthv/go-api-base/services"
 )
 
 type AuthHandler struct {
 	Handler
+	authService *services.AuthService
 }
 
-func NewAuthHandler(db *pg.DB, logger *logrus.Logger) *AuthHandler {
-	ah := &AuthHandler{}
-	ah.DB = db
-	ah.Logger = logger
+func NewAuthHandler(handler *Handler) *AuthHandler {
+	ah := &AuthHandler{
+		Handler:     *handler,
+		authService: services.NewAuthService(handler.logger, handler.store, handler.redis),
+	}
+
 	return ah
 }
 
@@ -37,9 +39,15 @@ func (h *AuthHandler) login(w http.ResponseWriter, r *http.Request) {
 	err := h.parseJSONBody(r, body)
 
 	if err != nil {
-		h.badDataResponse(w)
+		h.badDataResponse(w, "")
 		return
 	}
 
-	// TODO login logic
+	user := h.authService.GetUser(body.Email)
+	if user.ID == 0 || h.authService.IsValidPassword(user, body.Password) == false {
+		h.badDataResponse(w, "Invalid email & password combination")
+		return
+	}
+
+	h.sendResponse(w, nil)
 }

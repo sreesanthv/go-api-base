@@ -5,15 +5,24 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/go-pg/pg"
 	"github.com/sirupsen/logrus"
+	"github.com/sreesanthv/go-api-base/database"
 )
 
 const SUCCESS_REPONSE int = 2
 
 type Handler struct {
-	DB     *pg.DB
-	Logger *logrus.Logger
+	logger *logrus.Logger
+	store  *database.Store
+	redis  *database.Redis
+}
+
+func NewHandler(logger *logrus.Logger, store *database.Store, redis *database.Redis) *Handler {
+	return &Handler{
+		logger: logger,
+		store:  store,
+		redis:  redis,
+	}
 }
 
 // read request
@@ -22,12 +31,12 @@ func (h *Handler) parseJSONBody(r *http.Request, reqData interface{}) error {
 
 	_, err := buf.ReadFrom(r.Body)
 	if err != nil {
-		h.Logger.Error(err)
+		h.logger.Error(err)
 	}
 
 	err = json.Unmarshal(buf.Bytes(), reqData)
 	if err != nil {
-		h.Logger.Error(err)
+		h.logger.Error(err)
 	}
 
 	return err
@@ -36,7 +45,7 @@ func (h *Handler) parseJSONBody(r *http.Request, reqData interface{}) error {
 type responseData struct {
 	Status  string      `json:"status"`
 	Message string      `json:"message",omitempty`
-	Data    interface{} `json:"data"`
+	Data    interface{} `json:"data,omitempty"`
 }
 
 // send success repsone
@@ -48,7 +57,7 @@ func (h *Handler) sendResponse(w http.ResponseWriter, resData interface{}) {
 
 	jData, err := json.Marshal(dt)
 	if err != nil {
-		h.Logger.Error(err)
+		h.logger.Error(err)
 	}
 
 	w.Header().Set("Content-Type", "application/json")
@@ -56,15 +65,19 @@ func (h *Handler) sendResponse(w http.ResponseWriter, resData interface{}) {
 	w.WriteHeader(http.StatusOK)
 }
 
-func (h *Handler) badDataResponse(w http.ResponseWriter) {
+func (h *Handler) badDataResponse(w http.ResponseWriter, message string) {
+	if message == "" {
+		message = "Invalid request data"
+	}
+
 	dt := &responseData{
 		Status:  "nok",
-		Message: "Invalid request data",
+		Message: message,
 	}
 
 	jData, err := json.Marshal(dt)
 	if err != nil {
-		h.Logger.Error(err)
+		h.logger.Error(err)
 	}
 
 	w.Header().Set("Content-Type", "application/json")

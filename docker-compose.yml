@@ -1,0 +1,17 @@
+version: "3"
+
+services:
+  db:
+    image: postgres:11.12
+    volumes:
+      - ./data/db:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=goapibase
+      - POSTGRES_USER=goapibase
+      - POSTGRES_PASSWORD=goapibase
+    ports:
+      - "5432:5432"
+  redis:
+    image: redis:alpine3.13
+    ports:
+      - "6379:6379"

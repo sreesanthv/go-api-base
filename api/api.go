@@ -22,7 +22,11 @@ func New() (*chi.Mux, error) {
 		return nil, err
 	}
 
-	auth := NewAuthHandler(db, logger)
+	redis := database.NewRedis(logger)
+	store := database.NewStore(db, logger)
+
+	handler := NewHandler(logger, store, redis)
+	auth := NewAuthHandler(handler)
 
 	r := chi.NewRouter()
 	r.Use(middleware.Recoverer)
