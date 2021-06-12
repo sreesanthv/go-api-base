@@ -38,9 +38,17 @@ func (r *Redis) Set(key string, value interface{}, expiry time.Duration) error {
 
 func (r *Redis) Get(key string) (string, error) {
 	res, err := r.rdb.Get(r.ctx, key).Result()
-	if err != redis.Nil {
+	if err != nil && err != redis.Nil {
 		r.logger.Error("Error accessing Redis:", err)
 	}
 
 	return res, err
+}
+
+func (r *Redis) Delete(key string) error {
+	err := r.rdb.Del(r.ctx, key).Err()
+	if err != nil && err != redis.Nil {
+		r.logger.Error("Error deleting Redis:", err)
+	}
+	return nil
 }
