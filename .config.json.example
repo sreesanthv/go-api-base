@@ -1,7 +1,12 @@
 {
+    "port":"localhost:3000",
     "db_network": "tcp",
     "db_addr": "localhost:5432",
     "db_user": "goapibase",
     "db_password": "goapibase",
-    "db_database": "goapibase"
+    "db_database": "goapibase",
+    "redis_addr": "localhost:6379",
+    "redis_password": "",
+    "jwt_secret_access": "randomjwtst1ringsecret",
+    "jwt_secret_refresh": "randomjwtstr2ingsecret"
 }
