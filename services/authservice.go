@@ -29,13 +29,13 @@ func NewAuthService(log *logrus.Logger, store *database.Store, redis *database.R
 	}
 }
 
-func (s *AuthService) GetUser(email string) *database.AccountStore {
-	user, _ := s.store.GetUser(email)
+func (s *AuthService) GetAccount(email string) *database.AccountStore {
+	user, _ := s.store.GetAccount(email)
 	return user
 }
 
-func (s *AuthService) GetUserById(id int64) *database.AccountStore {
-	user, _ := s.store.GetUserById(id)
+func (s *AuthService) GetAccountById(id int64) *database.AccountStore {
+	user, _ := s.store.GetAccountById(id)
 	return user
 }
 
@@ -215,4 +215,16 @@ func (s *AuthService) DropToken(uuid string) error {
 	}
 
 	return err
+}
+
+// to create new user
+func (s *AuthService) CreateAccount(info map[string]string) (*database.AccountStore, error) {
+	hash, err := HashPassword(info["password"])
+	if err != nil {
+		s.logger.Error(err)
+		return nil, err
+	}
+	info["password"] = hash
+
+	return s.store.CreateAccount(info)
 }

@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/go-playground/validator/v10"
 	"github.com/sirupsen/logrus"
 	"github.com/sreesanthv/go-api-base/database"
 )
@@ -12,16 +13,18 @@ import (
 const SUCCESS_REPONSE int = 2
 
 type Handler struct {
-	logger *logrus.Logger
-	store  *database.Store
-	redis  *database.Redis
+	logger    *logrus.Logger
+	store     *database.Store
+	redis     *database.Redis
+	validator *validator.Validate
 }
 
 func NewHandler(logger *logrus.Logger, store *database.Store, redis *database.Redis) *Handler {
 	return &Handler{
-		logger: logger,
-		store:  store,
-		redis:  redis,
+		logger:    logger,
+		store:     store,
+		redis:     redis,
+		validator: validator.New(),
 	}
 }
 

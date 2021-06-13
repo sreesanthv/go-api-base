@@ -30,3 +30,5 @@ Clone this repo and start your API development.
 - JWT Token - github.com/dgrijalva/jwt-go
 - Cli - https://github.com/spf13/cobra
 - Configuration - https://github.com/spf13/viper
+- Validation - https://github.com/go-playground/validator
+- Redis - https://github.com/go-redis/redis

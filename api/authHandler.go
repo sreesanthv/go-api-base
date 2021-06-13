@@ -26,6 +26,7 @@ func (h *AuthHandler) Router() *chi.Mux {
 	r := chi.NewRouter()
 	r.Post("/login", h.login)
 	r.Post("/refresh", h.refreshToken)
+	r.Post("/register", h.register)
 	return r
 }
 
@@ -45,7 +46,7 @@ func (h *AuthHandler) login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user := h.authService.GetUser(body.Email)
+	user := h.authService.GetAccount(body.Email)
 	if user.ID == 0 || h.authService.IsValidPassword(user, body.Password) == false {
 		h.badDataResponse(w, "Invalid email & password combination")
 		return
@@ -108,13 +109,60 @@ func (h *AuthHandler) refreshToken(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user := h.authService.GetUserById(tInfo.UserId)
+	user := h.authService.GetAccountById(tInfo.UserId)
 	if user.ID == 0 {
 		h.unAuthorized(w, "User doesn't exists")
 		return
 	}
 
 	tokens, err := h.newToken(user)
+	if err != nil {
+		h.ServerError(w)
+		return
+	}
+
+	h.sendResponse(w, tokens)
+}
+
+type userInfo struct {
+	Name     string `validate:"required"`
+	Email    string `validate:"required,email"`
+	Password string `validate:"required"`
+}
+
+// user registration
+func (h *AuthHandler) register(w http.ResponseWriter, r *http.Request) {
+	user := new(userInfo)
+	err := h.parseJSONBody(r, user)
+	if err != nil {
+		h.badDataResponse(w, "")
+		return
+	}
+
+	err = h.validator.Struct(user)
+	if err != nil {
+		h.badDataResponse(w, err.Error())
+		return
+	}
+
+	// check email already used
+	extAct := h.authService.GetAccount(user.Email)
+	if extAct.ID != 0 {
+		h.badDataResponse(w, "Email was already taken. Please try resetting password.")
+		return
+	}
+
+	account, err := h.authService.CreateAccount(map[string]string{
+		"name":     user.Name,
+		"email":    user.Email,
+		"password": user.Password,
+	})
+	if err != nil {
+		h.ServerError(w)
+		return
+	}
+
+	tokens, err := h.newToken(account)
 	if err != nil {
 		h.ServerError(w)
 		return

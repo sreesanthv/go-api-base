@@ -3,3 +3,4 @@ data
 docker-compose.yml
 .git
 go-api-base
+gin-bin

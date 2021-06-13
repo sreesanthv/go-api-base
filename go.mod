@@ -9,11 +9,16 @@ require (
 	github.com/go-chi/render v1.0.1
 	github.com/go-pg/migrations v6.2.0+incompatible
 	github.com/go-pg/pg v7.1.7+incompatible
+	github.com/go-playground/universal-translator v0.17.0 // indirect
+	github.com/go-playground/validator v9.31.0+incompatible
+	github.com/go-playground/validator/v10 v10.6.1
 	github.com/go-redis/redis/v8 v8.10.0
 	github.com/gofrs/uuid v3.2.0+incompatible
 	github.com/jackc/pgx v3.6.2+incompatible
 	github.com/jackc/pgx/v4 v4.11.0
 	github.com/jinzhu/inflection v1.0.0 // indirect
+	github.com/leodido/go-urn v1.2.1 // indirect
+	github.com/lyft/protoc-gen-validate v0.0.13
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/sirupsen/logrus v1.4.2
 	github.com/spf13/cobra v1.1.3
