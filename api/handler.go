@@ -3,8 +3,11 @@ package api
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"net/http"
+	"strconv"
 
+	"github.com/go-chi/jwtauth"
 	"github.com/go-playground/validator/v10"
 	"github.com/sirupsen/logrus"
 	"github.com/sreesanthv/go-api-base/database"
@@ -120,4 +123,37 @@ func (h *Handler) unAuthorized(w http.ResponseWriter, message string) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusUnauthorized)
 	w.Write(jData)
+}
+
+func (h *Handler) getClaims(r *http.Request) (map[string]interface{}, error) {
+	_, claims, err := jwtauth.FromContext(r.Context())
+	if err != nil {
+		h.logger.Error(err)
+	}
+
+	return claims, err
+}
+
+func (h *Handler) getUserId(r *http.Request) (int64, error) {
+	claims, err := h.getClaims(r)
+	if err != nil {
+		return 0, err
+	}
+
+	userId, err := strconv.ParseInt(fmt.Sprintf("%v", claims["user_id"]), 10, 32)
+	if err != nil {
+		h.logger.Error(err)
+		return 0, err
+	}
+
+	return userId, nil
+}
+
+func (h *Handler) getAuthUuid(r *http.Request) (string, error) {
+	claims, err := h.getClaims(r)
+	if err != nil {
+		return "", err
+	}
+
+	return fmt.Sprintf("%v", claims["access_uuid"]), nil
 }

@@ -6,6 +6,7 @@ require (
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/go-chi/chi v4.0.3+incompatible
 	github.com/go-chi/cors v1.2.0
+	github.com/go-chi/jwtauth v1.2.0
 	github.com/go-chi/render v1.0.1
 	github.com/go-pg/migrations v6.2.0+incompatible
 	github.com/go-pg/pg v7.1.7+incompatible
@@ -18,6 +19,7 @@ require (
 	github.com/jackc/pgx/v4 v4.11.0
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/leodido/go-urn v1.2.1 // indirect
+	github.com/lestrrat-go/jwx v1.1.0
 	github.com/lyft/protoc-gen-validate v0.0.13
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/sirupsen/logrus v1.4.2

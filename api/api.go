@@ -4,9 +4,11 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/dgrijalva/jwt-go"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/cors"
+	"github.com/go-chi/jwtauth"
 	"github.com/go-chi/render"
 	"github.com/spf13/viper"
 	"github.com/sreesanthv/go-api-base/database"
@@ -24,6 +26,7 @@ func New() (*chi.Mux, error) {
 
 	redis := database.NewRedis(logger)
 	store := database.NewStore(db, logger)
+	jwtAuth := jwtauth.New(jwt.SigningMethodHS256.Name, []byte(viper.GetString("jwt_secret_access")), nil)
 
 	handler := NewHandler(logger, store, redis)
 	auth := NewAuthHandler(handler)
@@ -34,6 +37,7 @@ func New() (*chi.Mux, error) {
 	r.Use(middleware.RealIP)
 	r.Use(middleware.DefaultCompress)
 	r.Use(middleware.Timeout(15 * time.Second))
+	r.Use(jwtauth.Verifier(jwtAuth))
 
 	r.Use(logging.NewStructuredLogger(logger))
 	r.Use(render.SetContentType(render.ContentTypeJSON))

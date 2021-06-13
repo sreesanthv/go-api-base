@@ -27,6 +27,12 @@ func (h *AuthHandler) Router() *chi.Mux {
 	r.Post("/login", h.login)
 	r.Post("/refresh", h.refreshToken)
 	r.Post("/register", h.register)
+
+	// protected route
+	r.Group(func(r chi.Router) {
+		r.Use(Authenticator(h.authService))
+		r.Post("/logout", h.logout)
+	})
 	return r
 }
 
@@ -169,4 +175,21 @@ func (h *AuthHandler) register(w http.ResponseWriter, r *http.Request) {
 	}
 
 	h.sendResponse(w, tokens)
+}
+
+// logout
+func (h *AuthHandler) logout(w http.ResponseWriter, r *http.Request) {
+	uuid, err := h.getAuthUuid(r)
+	if err != nil || uuid == "" {
+		h.ServerError(w)
+		return
+	}
+
+	err = h.authService.DropToken(uuid)
+	if err != nil {
+		h.ServerError(w)
+		return
+	}
+
+	h.sendResponse(w, nil)
 }

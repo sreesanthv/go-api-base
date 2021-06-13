@@ -38,8 +38,8 @@ Open http://localhost:8081 in browser.
 ## Integrated Packages
 - HTTP Router - https://github.com/go-chi/chi
 - PostgreSQL - https://github.com/jackc/pgx
-- Logging - github.com/sirupsen/logrus
-- JWT Token - github.com/dgrijalva/jwt-go
+- Logging - https://github.com/sirupsen/logrus
+- JWT Token - https://github.com/dgrijalva/jwt-go
 - Cli - https://github.com/spf13/cobra
 - Configuration - https://github.com/spf13/viper
 - Validation - https://github.com/go-playground/validator

@@ -16,26 +16,26 @@ const TokenTypeAccess = 0
 const TokenTypeRefresh = 1
 
 type AuthService struct {
-	logger *logrus.Logger
-	store  *database.Store
-	redis  *database.Redis
+	Logger *logrus.Logger
+	Store  *database.Store
+	Redis  *database.Redis
 }
 
 func NewAuthService(log *logrus.Logger, store *database.Store, redis *database.Redis) *AuthService {
 	return &AuthService{
-		logger: log,
-		store:  store,
-		redis:  redis,
+		Logger: log,
+		Store:  store,
+		Redis:  redis,
 	}
 }
 
 func (s *AuthService) GetAccount(email string) *database.AccountStore {
-	user, _ := s.store.GetAccount(email)
+	user, _ := s.Store.GetAccount(email)
 	return user
 }
 
 func (s *AuthService) GetAccountById(id int64) *database.AccountStore {
-	user, _ := s.store.GetAccountById(id)
+	user, _ := s.Store.GetAccountById(id)
 	return user
 }
 
@@ -61,12 +61,12 @@ func (s *AuthService) CreateToken(user *database.AccountStore) (*TokenDetails, e
 
 	uuidAcc, err := uuid.NewV4()
 	if err != nil {
-		s.logger.Errorf("Error generating uuid - access:", err)
+		s.Logger.Errorf("Error generating uuid - access:", err)
 		return nil, err
 	}
 	uuidRef, err := uuid.NewV4()
 	if err != nil {
-		s.logger.Errorf("Error generating uuid - refresh:", err)
+		s.Logger.Errorf("Error generating uuid - refresh:", err)
 		return nil, err
 	}
 
@@ -84,7 +84,7 @@ func (s *AuthService) CreateToken(user *database.AccountStore) (*TokenDetails, e
 	at := jwt.NewWithClaims(jwt.SigningMethodHS256, atClaims)
 	td.AccessToken, err = at.SignedString([]byte(viper.GetString("jwt_secret_access")))
 	if err != nil {
-		s.logger.Errorf("Error creating access token:", err)
+		s.Logger.Errorf("Error creating access token:", err)
 		return nil, err
 	}
 
@@ -96,7 +96,7 @@ func (s *AuthService) CreateToken(user *database.AccountStore) (*TokenDetails, e
 	rt := jwt.NewWithClaims(jwt.SigningMethodHS256, rtClaims)
 	td.RefreshToken, err = rt.SignedString([]byte(viper.GetString("jwt_secret_refresh")))
 	if err != nil {
-		s.logger.Errorf("Error creating refresh token:", err)
+		s.Logger.Errorf("Error creating refresh token:", err)
 		return nil, err
 	}
 
@@ -107,13 +107,13 @@ func (s *AuthService) CreateToken(user *database.AccountStore) (*TokenDetails, e
 func (s *AuthService) PersistToken(userId int64, td *TokenDetails) error {
 	now := time.Now()
 	at := time.Unix(td.AtExpires, 0)
-	err := s.redis.Set(td.AccessUuid, strconv.Itoa(int(userId)), at.Sub(now))
+	err := s.Redis.Set(td.AccessUuid, strconv.Itoa(int(userId)), at.Sub(now))
 	if err != nil {
 		return err
 	}
 
 	rt := time.Unix(td.RtExpires, 0)
-	err = s.redis.Set(td.RefreshUuid, strconv.Itoa(int(userId)), rt.Sub(now))
+	err = s.Redis.Set(td.RefreshUuid, strconv.Itoa(int(userId)), rt.Sub(now))
 	if err != nil {
 		return err
 	}
@@ -142,26 +142,26 @@ func (s *AuthService) ParseToken(tk string, tType int) (*AccessDetails, error) {
 	token, err := jwt.Parse(tk, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			err := fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
-			s.logger.Error(err)
+			s.Logger.Error(err)
 			return nil, err
 		}
 		return []byte(secret), nil
 	})
 	if err != nil {
-		s.logger.Error(err)
+		s.Logger.Error(err)
 		return nil, err
 	}
 
 	if _, ok := token.Claims.(jwt.Claims); !ok && !token.Valid {
 		err := fmt.Errorf("Invalid JWT token")
-		s.logger.Error(err)
+		s.Logger.Error(err)
 		return nil, err
 	}
 
 	claims, ok := token.Claims.(jwt.MapClaims)
 	if !ok {
 		err := fmt.Errorf("Failed to extract JWT claim")
-		s.logger.Error(err)
+		s.Logger.Error(err)
 		return nil, err
 	}
 
@@ -172,17 +172,17 @@ func (s *AuthService) ParseToken(tk string, tType int) (*AccessDetails, error) {
 	}
 
 	// fetch info from redis
-	id, err := s.redis.Get(uuid)
+	id, err := s.Redis.Get(uuid)
 	if err != nil || id == "" {
 		err := fmt.Errorf("Invalid JWT token")
-		s.logger.Error(err)
+		s.Logger.Error(err)
 		return nil, err
 	}
 
 	tUserId, err := strconv.ParseInt(id, 10, 32)
 	if err != nil || id == "" {
 		err := fmt.Errorf("Invalid JWT token")
-		s.logger.Error(err)
+		s.Logger.Error(err)
 		return nil, err
 	}
 
@@ -190,13 +190,13 @@ func (s *AuthService) ParseToken(tk string, tType int) (*AccessDetails, error) {
 	userId, err := strconv.ParseInt(fmt.Sprintf("%v", claims["user_id"]), 10, 32)
 	if err != nil || userId == 0 {
 		err := fmt.Errorf("user_id not present in claim: %s", err)
-		s.logger.Error(err)
+		s.Logger.Error(err)
 		return nil, err
 	}
 
 	if userId != tUserId {
 		err := fmt.Errorf("Token user_id mismatch")
-		s.logger.Error(err)
+		s.Logger.Error(err)
 		return nil, err
 	}
 
@@ -209,9 +209,9 @@ func (s *AuthService) ParseToken(tk string, tType int) (*AccessDetails, error) {
 }
 
 func (s *AuthService) DropToken(uuid string) error {
-	err := s.redis.Delete(uuid)
+	err := s.Redis.Delete(uuid)
 	if err != nil {
-		s.logger.Error("Failed to drop token")
+		s.Logger.Error("Failed to drop token")
 	}
 
 	return err
@@ -221,10 +221,10 @@ func (s *AuthService) DropToken(uuid string) error {
 func (s *AuthService) CreateAccount(info map[string]string) (*database.AccountStore, error) {
 	hash, err := HashPassword(info["password"])
 	if err != nil {
-		s.logger.Error(err)
+		s.Logger.Error(err)
 		return nil, err
 	}
 	info["password"] = hash
 
-	return s.store.CreateAccount(info)
+	return s.Store.CreateAccount(info)
 }
