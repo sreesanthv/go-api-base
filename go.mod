@@ -4,7 +4,6 @@ go 1.14
 
 require (
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
-	github.com/dhax/go-base v0.0.0-20210308144921-c3809c7cabc5
 	github.com/go-chi/chi v4.0.3+incompatible
 	github.com/go-chi/cors v1.2.0
 	github.com/go-chi/render v1.0.1
@@ -14,9 +13,11 @@ require (
 	github.com/gofrs/uuid v3.2.0+incompatible
 	github.com/jackc/pgx v3.6.2+incompatible
 	github.com/jackc/pgx/v4 v4.11.0
+	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/sirupsen/logrus v1.4.2
 	github.com/spf13/cobra v1.1.3
 	github.com/spf13/viper v1.7.1
 	golang.org/x/crypto v0.0.0-20210322153248-0c34fe9e7dc2
+	mellium.im/sasl v0.2.1 // indirect
 )

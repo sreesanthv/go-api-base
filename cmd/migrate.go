@@ -2,7 +2,7 @@ package cmd
 
 import (
 	"github.com/spf13/cobra"
-	"github.com/sreesanthv/go-api-base/database/migrate"
+	"github.com/sreesanthv/go-api-base/migrations"
 )
 
 var reset bool
@@ -23,9 +23,9 @@ var migrateCmd = &cobra.Command{
 		}
 
 		if reset {
-			migrate.Reset()
+			migrations.Reset()
 		}
-		migrate.Migrate(argsMig)
+		migrations.Migrate(argsMig)
 	},
 }
 

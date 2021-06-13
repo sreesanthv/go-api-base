@@ -22,3 +22,11 @@ Clone this repo and start your API development.
 - ```app``` package can import ```service``` package. ```service``` can't import ```app```.
 - ```service``` package can import ```database``` package. database can't import ```service```.
 - Do not import ```database``` package directly from app.
+
+## Integrated Packages
+- HTTP Router - https://github.com/go-chi/chi
+- PostgreSQL - https://github.com/jackc/pgx
+- Logging - github.com/sirupsen/logrus
+- JWT Token - github.com/dgrijalva/jwt-go
+- Cli - https://github.com/spf13/cobra
+- Configuration - https://github.com/spf13/viper
