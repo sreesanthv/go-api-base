@@ -2,3 +2,4 @@ data
 .config.json
 docker-compose.yml
 .git
+go-api-base
