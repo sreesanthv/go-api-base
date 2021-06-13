@@ -3,13 +3,24 @@
 Clone this repo and start your API development.
 
 ## Start Application
-- Clone this repository
-- Start API with *serve*: ```go run main.go serve```
-
-## Environment Variables
+### Configuration
 - Please refer .config.json.example
 - You can modify .config.json the file or set in Env
 - To use config file, duplicate .config.json.example and name it .config.json
+- Please correct ```db_addr, redis_addr``` to run in local.
+### Docker
+- Clone this repository
+- Build Docker Images ```docker-compose build api```
+- Run Docker Container ```docker-compose up api```
+### Local
+- Start dependencies ```docker-compose up -d db redis```
+- Start API with *serve*: ```go run main.go serve```
+
+### Dev Dependencies
+- Install https://github.com/codegangsta/gin for live reloading.
+Run ```gin serve```
+- Start Redis UI by ```docker-compose up -d redis-commander```
+Open http://localhost:8081 in browser.
 
 ## Database
 - Integrated with PostgreSQL
@@ -19,9 +30,10 @@ Clone this repo and start your API development.
 
 ## Dev Guidelines
 - In order to prevent circular dependency follow the below rules.
-- ```app``` package can import ```service``` package. ```service``` can't import ```app```.
+- ```api``` package can import ```service``` package. ```service``` can't import ```api```.
 - ```service``` package can import ```database``` package. database can't import ```service```.
-- Do not import ```database``` package directly from app.
+- Do not import ```database``` package directly from api.
+- Preferred import flow: ```api -> services -> database```
 
 ## Integrated Packages
 - HTTP Router - https://github.com/go-chi/chi
