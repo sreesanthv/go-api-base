@@ -10,19 +10,19 @@ import (
 	"github.com/go-chi/jwtauth"
 	"github.com/go-playground/validator/v10"
 	"github.com/sirupsen/logrus"
-	"github.com/sreesanthv/go-api-base/database"
+	"github.com/sreesanthv/go-api-base/interfaces"
 )
 
 const SUCCESS_REPONSE int = 2
 
 type Handler struct {
 	logger    *logrus.Logger
-	store     *database.Store
-	redis     *database.Redis
+	store     interfaces.Store
+	redis     interfaces.Redis
 	validator *validator.Validate
 }
 
-func NewHandler(logger *logrus.Logger, store *database.Store, redis *database.Redis) *Handler {
+func NewHandler(logger *logrus.Logger, store interfaces.Store, redis interfaces.Redis) *Handler {
 	return &Handler{
 		logger:    logger,
 		store:     store,

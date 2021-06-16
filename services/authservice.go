@@ -10,6 +10,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"github.com/sreesanthv/go-api-base/database"
+	"github.com/sreesanthv/go-api-base/interfaces"
 )
 
 const TokenTypeAccess = 0
@@ -17,11 +18,11 @@ const TokenTypeRefresh = 1
 
 type AuthService struct {
 	Logger *logrus.Logger
-	Store  *database.Store
-	Redis  *database.Redis
+	Store  interfaces.Store
+	Redis  interfaces.Redis
 }
 
-func NewAuthService(log *logrus.Logger, store *database.Store, redis *database.Redis) *AuthService {
+func NewAuthService(log *logrus.Logger, store interfaces.Store, redis interfaces.Redis) *AuthService {
 	return &AuthService{
 		Logger: log,
 		Store:  store,
@@ -61,12 +62,12 @@ func (s *AuthService) CreateToken(user *database.AccountStore) (*TokenDetails, e
 
 	uuidAcc, err := uuid.NewV4()
 	if err != nil {
-		s.Logger.Errorf("Error generating uuid - access:", err)
+		s.Logger.Error("Error generating uuid - access:", err)
 		return nil, err
 	}
 	uuidRef, err := uuid.NewV4()
 	if err != nil {
-		s.Logger.Errorf("Error generating uuid - refresh:", err)
+		s.Logger.Error("Error generating uuid - refresh:", err)
 		return nil, err
 	}
 
@@ -84,7 +85,7 @@ func (s *AuthService) CreateToken(user *database.AccountStore) (*TokenDetails, e
 	at := jwt.NewWithClaims(jwt.SigningMethodHS256, atClaims)
 	td.AccessToken, err = at.SignedString([]byte(viper.GetString("jwt_secret_access")))
 	if err != nil {
-		s.Logger.Errorf("Error creating access token:", err)
+		s.Logger.Error("Error creating access token:", err)
 		return nil, err
 	}
 
@@ -96,7 +97,12 @@ func (s *AuthService) CreateToken(user *database.AccountStore) (*TokenDetails, e
 	rt := jwt.NewWithClaims(jwt.SigningMethodHS256, rtClaims)
 	td.RefreshToken, err = rt.SignedString([]byte(viper.GetString("jwt_secret_refresh")))
 	if err != nil {
-		s.Logger.Errorf("Error creating refresh token:", err)
+		s.Logger.Error("Error creating refresh token:", err)
+		return nil, err
+	}
+
+	err = s.Store.SaveLoginTime(user.ID)
+	if err != nil {
 		return nil, err
 	}
 

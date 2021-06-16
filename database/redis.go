@@ -27,7 +27,7 @@ func NewRedis(logger *logrus.Logger) *Redis {
 	}
 }
 
-func (r *Redis) Set(key string, value interface{}, expiry time.Duration) error {
+func (r *Redis) Set(key string, value string, expiry time.Duration) error {
 	err := r.rdb.Set(r.ctx, key, value, expiry).Err()
 	if err != nil {
 		r.logger.Error("Error writing Redis:", err)

@@ -1,7 +1,5 @@
 package database
 
-import "fmt"
-
 type AccountStore struct {
 	ID       int64
 	Email    string
@@ -16,7 +14,7 @@ func (s *Store) GetAccount(email string) (*AccountStore, error) {
 	)
 
 	if err != nil && s.IsSQLError(err) {
-		fmt.Println("Error in GetAccount query", err)
+		s.logger.Error("Error in GetAccount query:", err)
 		return as, err
 	}
 
@@ -30,7 +28,7 @@ func (s *Store) GetAccountById(id int64) (*AccountStore, error) {
 	)
 
 	if err != nil && s.IsSQLError(err) {
-		fmt.Println("Error in GetAccount query", err)
+		s.logger.Error("Error in GetAccount query", err)
 		return as, err
 	}
 
@@ -38,7 +36,7 @@ func (s *Store) GetAccountById(id int64) (*AccountStore, error) {
 }
 
 func (s *Store) CreateAccount(info map[string]string) (*AccountStore, error) {
-	var userId int
+	var userId int64
 	sql := "INSERT INTO accounts (email, name, password) VALUES($1, $2, $3) RETURNING id"
 	err := s.db.QueryRow(s.ctx, sql, info["email"], info["name"], info["password"]).Scan(&userId)
 	if err != nil {
@@ -47,9 +45,19 @@ func (s *Store) CreateAccount(info map[string]string) (*AccountStore, error) {
 	}
 
 	return &AccountStore{
-		ID:       int64(userId),
+		ID:       userId,
 		Email:    info["email"],
 		Name:     info["name"],
 		Password: info["password"],
 	}, nil
+}
+
+func (s *Store) SaveLoginTime(userId int64) error {
+	sql := "UPDATE accounts SET last_login	= NOW() WHERE id = $1"
+	_, err := s.db.Exec(s.ctx, sql, userId)
+	if err != nil {
+		s.logger.Error("Error setting last login time:", err)
+	}
+
+	return err
 }

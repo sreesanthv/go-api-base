@@ -32,6 +32,7 @@ func (h *AuthHandler) Router() *chi.Mux {
 	r.Group(func(r chi.Router) {
 		r.Use(Authenticator(h.authService))
 		r.Post("/logout", h.logout)
+		r.Get("/profile", h.profile)
 	})
 	return r
 }
@@ -192,4 +193,25 @@ func (h *AuthHandler) logout(w http.ResponseWriter, r *http.Request) {
 	}
 
 	h.sendResponse(w, nil)
+}
+
+func (h *AuthHandler) profile(w http.ResponseWriter, r *http.Request) {
+	userId, err := h.getUserId(r)
+	if err != nil {
+		h.ServerError(w)
+		return
+	}
+
+	user := h.authService.GetAccountById(userId)
+	if user.ID == 0 {
+		h.badDataResponse(w, "User doesn't exist")
+		return
+	}
+
+	profile := map[string]string{
+		"name":  user.Name,
+		"email": user.Email,
+	}
+
+	h.sendResponse(w, profile)
 }
